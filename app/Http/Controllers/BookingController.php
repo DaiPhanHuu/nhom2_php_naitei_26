@@ -37,8 +37,13 @@ class BookingController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $userReviewTourIds = \App\Models\Review::where('user_id', $request->user()->user_id)
+            ->pluck('tour_id')
+            ->toArray();
+
         return view('bookings.index', [
             'bookings' => $bookings,
+            'userReviewTourIds' => $userReviewTourIds,
             'statusCounts' => $request->user()->bookings()
                 ->selectRaw('status, count(*) as total')
                 ->groupBy('status')
@@ -143,7 +148,14 @@ class BookingController extends Controller
 
         $booking->load(['schedule.tour', 'ticketType', 'details', 'payment']);
 
-        return view('bookings.show', ['booking' => $booking]);
+        $hasReviewed = \App\Models\Review::where('user_id', request()->user()->user_id)
+            ->where('tour_id', $booking->schedule->tour_id)
+            ->exists();
+
+        return view('bookings.show', [
+            'booking' => $booking,
+            'hasReviewed' => $hasReviewed,
+        ]);
     }
 
     /**

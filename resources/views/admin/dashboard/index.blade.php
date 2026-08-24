@@ -16,9 +16,9 @@
                     <path d="M3 3v18h18" stroke-linecap="round"/><path d="m7 14 4-4 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </span>
-            <div class="min-w-0">
-                <div class="stat-value truncate">{{ number_format((float) $totalRevenue) }}₫</div>
-                <div class="stat-label">Tổng doanh thu</div>
+            <div class="flex-1 min-w-0">
+                <div class="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight leading-none whitespace-nowrap overflow-x-auto">{{ number_format((float) $totalRevenue) }}₫</div>
+                <div class="stat-label mt-1.5">Tổng doanh thu</div>
             </div>
         </div>
 

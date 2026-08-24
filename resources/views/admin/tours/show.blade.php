@@ -113,10 +113,12 @@
                                                 </button>
                                             </form>
                                         @endif
-                                        <form action="{{ route('admin.tours.images.destroy', [$tour, $img]) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa ảnh này?');" class="{{ $img->is_cover ? 'w-full' : '' }}">
+                                        <form action="{{ route('admin.tours.images.destroy', [$tour, $img]) }}" method="POST"
+                                              @submit.prevent="askConfirm($el, 'Xác nhận xoá ảnh', 'Bạn có chắc chắn muốn xoá hình ảnh này khỏi Tour?')"
+                                              class="{{ $img->is_cover ? 'w-full' : '' }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-2 py-1 text-[11px] bg-red-50 hover:bg-red-100 text-red-600:bg-red-900/60 font-medium rounded transition">
+                                            <button type="submit" class="px-2 py-1 text-[11px] bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded transition">
                                                 Xóa
                                             </button>
                                         </form>
@@ -207,10 +209,11 @@
                                                 <button @click="editingScheduleId = {{ $sch->schedule_id }}" class="px-2 py-1 text-xs bg-emerald-50 hover:bg-emerald-100 text-[#2D5A3D]:bg-emerald-900/70 font-medium rounded transition">
                                                     ✏ Sửa
                                                 </button>
-                                                <form action="{{ route('admin.tours.schedules.destroy', [$tour, $sch]) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch khởi hành ngày {{ \Carbon\Carbon::parse($sch->departure_date)->format('d/m/Y') }}?');">
+                                                <form action="{{ route('admin.tours.schedules.destroy', [$tour, $sch]) }}" method="POST"
+                                                      @submit.prevent="askConfirm($el, 'Xác nhận xoá lịch khởi hành', 'Bạn có chắc chắn muốn xoá lịch khởi hành ngày {{ \Carbon\Carbon::parse($sch->departure_date)->format('d/m/Y') }}?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="px-2 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600:bg-red-900/70 font-medium rounded transition">
+                                                    <button type="submit" class="px-2 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded transition">
                                                         🗑 Xóa
                                                     </button>
                                                 </form>
@@ -316,10 +319,11 @@
                                         <button @click="editingId = {{ $itin->itinerary_id }}" class="px-2.5 py-1 text-xs bg-emerald-50 hover:bg-emerald-100 text-[#2D5A3D]:bg-emerald-900/70 font-medium rounded transition">
                                             ✏ Sửa
                                         </button>
-                                        <form action="{{ route('admin.tours.itineraries.destroy', [$tour, $itin]) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch trình ngày {{ $itin->day_number }}?');">
+                                        <form action="{{ route('admin.tours.itineraries.destroy', [$tour, $itin]) }}" method="POST"
+                                              @submit.prevent="askConfirm($el, 'Xác nhận xoá lịch trình', 'Bạn có chắc chắn muốn xoá lịch trình Ngày {{ $itin->day_number }}?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-2.5 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600:bg-red-900/70 font-medium rounded transition">
+                                            <button type="submit" class="px-2.5 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded transition">
                                                 🗑 Xóa
                                             </button>
                                         </form>

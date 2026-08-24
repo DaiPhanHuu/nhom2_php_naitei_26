@@ -50,7 +50,122 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="antialiased bg-gray-50 text-gray-900" style="font-family: 'Livvic', sans-serif;">
-        <div class="min-h-screen flex" x-data="{ sidebar: false }">
+        <div class="min-h-screen flex" x-data="{
+            sidebar: false,
+            confirmOpen: false,
+            confirmTitle: 'Xác nhận thao tác',
+            confirmMessage: 'Bạn có chắc chắn muốn thực hiện thao tác này?',
+            confirmForm: null,
+            toasts: [],
+            addToast(type, message) {
+                const id = Date.now() + Math.random();
+                this.toasts.push({ id, type, message });
+                setTimeout(() => this.removeToast(id), 4500);
+            },
+            removeToast(id) {
+                this.toasts = this.toasts.filter(t => t.id !== id);
+            },
+            askConfirm(form, title, message) {
+                this.confirmForm = form;
+                this.confirmTitle = title || 'Xác nhận xóa';
+                this.confirmMessage = message || 'Hành động này không thể hoàn tác. Bạn có chắc muốn tiếp tục?';
+                this.confirmOpen = true;
+            },
+            doConfirm() {
+                if (this.confirmForm) {
+                    this.confirmForm.submit();
+                }
+                this.confirmOpen = false;
+            }
+        }"
+        x-init="
+            @if (session('status')) addToast('success', '{{ e(session('status')) }}'); @endif
+            @if (session('success')) addToast('success', '{{ e(session('success')) }}'); @endif
+            @if (session('error')) addToast('error', '{{ e(session('error')) }}'); @endif
+            @if (session('warning')) addToast('warning', '{{ e(session('warning')) }}'); @endif
+        ">
+
+            {{-- Floating Toast Notifications --}}
+            <div class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none px-4" x-cloak>
+                <template x-for="toast in toasts" :key="toast.id">
+                    <div x-show="true"
+                         x-transition:enter="transition ease-out duration-300 transform"
+                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-200 transform"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                         class="pointer-events-auto flex items-start gap-3.5 p-4 rounded-2xl shadow-xl border text-sm font-medium transition-all"
+                         :class="{
+                             'bg-emerald-900 text-white border-emerald-700': toast.type === 'success',
+                             'bg-rose-900 text-white border-rose-700': toast.type === 'error',
+                             'bg-amber-800 text-white border-amber-600': toast.type === 'warning',
+                             'bg-slate-900 text-white border-slate-700': toast.type === 'info'
+                         }">
+                        <template x-if="toast.type === 'success'">
+                            <div class="w-6 h-6 rounded-full bg-emerald-600/60 flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                        </template>
+                        <template x-if="toast.type === 'error'">
+                            <div class="w-6 h-6 rounded-full bg-rose-600/60 flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-rose-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </div>
+                        </template>
+                        <template x-if="toast.type === 'warning'">
+                            <div class="w-6 h-6 rounded-full bg-amber-600/60 flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-amber-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                        </template>
+                        <div class="flex-1 pt-0.5 leading-relaxed" x-text="toast.message"></div>
+                        <button type="button" @click="removeToast(toast.id)" class="text-white/70 hover:text-white shrink-0 p-0.5 rounded-lg hover:bg-white/10 transition">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Confirm Delete/Action Modal --}}
+            <div x-show="confirmOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div x-show="confirmOpen"
+                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                         @click="confirmOpen = false"
+                         class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
+
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                    <div x-show="confirmOpen"
+                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                         x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                         class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+                        <div class="bg-white px-6 pt-6 pb-4">
+                            <div class="sm:flex sm:items-start gap-4">
+                                <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-rose-100 sm:mx-0">
+                                    <svg class="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                                    <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title" x-text="confirmTitle"></h3>
+                                    <div class="mt-2">
+                                        <p class="text-sm text-gray-500 leading-relaxed" x-text="confirmMessage"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse gap-3">
+                            <button type="button" @click="doConfirm()" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2.5 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none sm:w-auto sm:text-sm transition shadow-rose-200">
+                                Xác nhận xóa
+                            </button>
+                            <button type="button" @click="confirmOpen = false" class="mt-3 sm:mt-0 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-2.5 bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none sm:w-auto sm:text-sm transition">
+                                Hủy bỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {{-- Sidebar --}}
             <aside class="fixed lg:static inset-y-0 left-0 z-40 w-72 shrink-0 bg-[#1B2A20] text-gray-300 flex flex-col
                           transition-transform lg:translate-x-0"

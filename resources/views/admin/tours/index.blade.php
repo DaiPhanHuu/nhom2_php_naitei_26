@@ -105,7 +105,7 @@
                                         <x-admin.action :href="route('admin.tours.show', $tour)">Chi tiết</x-admin.action>
                                         <x-admin.action :href="route('admin.tours.edit', $tour)" variant="primary">Sửa</x-admin.action>
                                         <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST"
-                                              onsubmit="return confirm('Xoá tour “{{ $tour->title }}”? Hành động này không thể hoàn tác.');">
+                                              @submit.prevent="askConfirm($el, 'Xác nhận xoá Tour', 'Bạn có chắc chắn muốn xoá tour &quot;{{ $tour->title }}&quot;? Tất cả lịch khởi hành và ảnh liên quan cũng sẽ bị ảnh hưởng.')">
                                             @csrf
                                             @method('DELETE')
                                             <x-admin.action type="submit" variant="danger">Xoá</x-admin.action>

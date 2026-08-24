@@ -92,8 +92,8 @@ class ReviewController extends Controller
                 [
                     'score' => $validated['score'],
                     'content' => $validated['content'],
-                    'status' => 'pending',
-                    'approved_at' => null,
+                    'status' => 'approved',
+                    'approved_at' => now(),
                 ]
             );
 
@@ -110,7 +110,7 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('reviews.index')
-            ->with('status', 'Cảm ơn bạn đã đánh giá! Bài viết sẽ hiển thị sau khi được duyệt.');
+            ->with('status', 'Cảm ơn bạn đã đánh giá! Đánh giá của bạn đã được đăng thành công.');
     }
 
     /**

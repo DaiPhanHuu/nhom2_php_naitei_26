@@ -130,6 +130,38 @@
                     <p class="mt-6 text-sm text-gray-500">Đã hủy lúc {{ $booking->cancelled_at->format('d/m/Y H:i') }}</p>
                 @endif
 
+                {{-- Đánh giá tour --}}
+                @if (in_array($booking->status, ['confirmed', 'completed'], true))
+                    <div class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100 border border-emerald-200 shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                                    <span>⭐ Đánh giá chuyến đi</span>
+                                    @if ($hasReviewed ?? false)
+                                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-800">Đã đánh giá</span>
+                                    @endif
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    {{ ($hasReviewed ?? false)
+                                        ? 'Cảm ơn bạn đã viết đánh giá cho tour này! Đánh giá của bạn giúp ích rất nhiều cho cộng đồng.'
+                                        : 'Hãy chia sẻ cảm nhận, hình ảnh thực tế và đánh giá chất lượng chuyến đi của bạn.' }}
+                                </p>
+                            </div>
+                            <div class="shrink-0">
+                                @if ($hasReviewed ?? false)
+                                    <a href="{{ route('tours.show', $booking->schedule->tour) }}" class="px-4 py-2 bg-white text-[#2D5A3D] hover:bg-emerald-50 border border-emerald-200 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center gap-1.5">
+                                        Xem trang Tour
+                                    </a>
+                                @else
+                                    <a href="{{ route('reviews.create', $booking) }}" class="btn-primary btn-sm inline-flex items-center gap-1.5 shadow">
+                                        ✍️ Viết đánh giá ngay
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="mt-8 flex flex-wrap gap-3">
                     @if ($booking->status === 'pending')
                         <a href="{{ route('bookings.pay', $booking) }}" class="btn-accent">

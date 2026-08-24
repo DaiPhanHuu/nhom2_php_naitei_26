@@ -18,9 +18,9 @@ test('admin can access dedicated admin dashboard page', function () {
     $response = $this->actingAs($admin)->get('/admin');
 
     $response->assertStatus(200)
-        ->assertSee('Trung tâm Điều khiển Admin')
+        ->assertSee('Dashboard')
         ->assertSee('Tổng doanh thu')
-        ->assertSee('Đơn đặt tour mới nhất');
+        ->assertSee('Đơn đặt chỗ mới nhất');
 });
 
 test('regular users cannot access admin dashboard page', function () {

@@ -1,91 +1,81 @@
-<x-admin-layout title="Quản lý Danh mục Tour">
-    <div class="mb-5 flex justify-end gap-3">
-        <a href="{{ route('admin.categories.create') }}" class="px-4 py-2 bg-[#2D6A2D] hover:bg-[#245524] text-white font-medium rounded-lg text-sm transition">
-                + Thêm danh mục mới
-            </a>
-    </div>
+<x-admin-layout title="Quản lý Danh mục Tour" subtitle="Phân loại các điểm đến và hình thức trải nghiệm du lịch">
+    <div class="space-y-6">
+        <x-admin.card :flush="true">
+            <x-slot:actions>
+                <a href="{{ route('admin.categories.create') }}" class="px-4 py-2 bg-[#2D6A2D] hover:bg-[#245524] text-white font-semibold rounded-xl text-sm transition shadow-sm inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    Thêm danh mục mới
+                </a>
+            </x-slot:actions>
 
-    <div>
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <!-- Search Filter -->
-                <form method="GET" action="{{ route('admin.categories.index') }}" class="mb-6 flex gap-4">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm theo tên danh mục..." class="w-full sm:w-80 rounded-lg border-gray-300 focus:border-[#2D5A3D] focus:ring-[#2D5A3D] text-sm">
-                    <button type="submit" class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-sm transition">
-                        Tìm kiếm
-                    </button>
-                    @if(request('search'))
-                        <a href="{{ route('admin.categories.index') }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm transition flex items-center">
-                            Xóa lọc
-                        </a>
-                    @endif
-                </form>
+            <div class="p-6 border-b border-gray-100 bg-gray-50/40">
+                <x-admin.filters :action="route('admin.categories.index')" placeholder="Tìm kiếm theo tên danh mục..." :hasFilter="request('search')">
+                </x-admin.filters>
+            </div>
 
-                <!-- Table -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">ID</th>
-                                <th scope="col" class="px-6 py-3">Tên danh mục</th>
-                                <th scope="col" class="px-6 py-3">Danh mục cha</th>
-                                <th scope="col" class="px-6 py-3 text-center">Số danh mục con</th>
-                                <th scope="col" class="px-6 py-3 text-center">Số lượng Tour</th>
-                                <th scope="col" class="px-6 py-3 text-right">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($categories as $category)
-                                <tr class="bg-white border-b hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-mono text-xs">{{ $category->category_id }}</td>
-                                    <td class="px-6 py-4 font-medium text-gray-900">
-                                        <a href="{{ route('admin.categories.show', $category) }}" class="hover:underline text-[#2D5A3D]">
-                                            {{ $category->name }}
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($category->parent)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                {{ $category->parent->name }}
-                                            </span>
-                                        @else
-                                            <span class="text-gray-400 italic">-- Danh mục gốc --</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800 font-semibold">
-                                            {{ $category->children_count }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-800 font-semibold">
-                                            {{ $category->tours_count }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right space-x-2">
-                                        <a href="{{ route('admin.categories.show', $category) }}" class="text-blue-600 hover:text-blue-900 font-medium text-xs">Chi tiết</a>
-                                        <a href="{{ route('admin.categories.edit', $category) }}" class="text-[#2D5A3D] hover:text-[#2D5A3D] font-medium text-xs">Sửa</a>
-                                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này?');">
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4">Mã ID</th>
+                            <th class="px-6 py-4">Tên danh mục</th>
+                            <th class="px-6 py-4">Danh mục cha</th>
+                            <th class="px-6 py-4 text-center">Số danh mục con</th>
+                            <th class="px-6 py-4 text-center">Số lượng Tour</th>
+                            <th class="px-6 py-4 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($categories as $category)
+                            <tr class="hover:bg-gray-50/80 transition">
+                                <td class="px-6 py-4 font-mono text-xs text-gray-400">#{{ $category->category_id }}</td>
+                                <td class="px-6 py-4 font-semibold text-gray-900">
+                                    <a href="{{ route('admin.categories.show', $category) }}" class="hover:text-[#2D5A3D] hover:underline transition">
+                                        {{ $category->name }}
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($category->parent)
+                                        <x-admin.badge variant="gray">{{ $category->parent->name }}</x-admin.badge>
+                                    @else
+                                        <span class="text-xs text-gray-400 italic">-- Danh mục gốc --</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <x-admin.badge variant="blue">{{ $category->children_count }}</x-admin.badge>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <x-admin.badge variant="green">{{ $category->tours_count }}</x-admin.badge>
+                                </td>
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
+                                    <x-admin.row-actions>
+                                        <x-admin.action :href="route('admin.categories.show', $category)">Chi tiết</x-admin.action>
+                                        <x-admin.action :href="route('admin.categories.edit', $category)" variant="primary">Sửa</x-admin.action>
+                                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-block"
+                                              @submit.prevent="askConfirm($el, 'Xác nhận xoá Danh mục', 'Bạn có chắc chắn muốn xoá danh mục {{ $category->name }}? Hành động này không thể hoàn tác.')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 font-medium text-xs">Xóa</button>
+                                            <x-admin.action type="submit" variant="danger">Xóa</x-admin.action>
                                         </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                        Chưa có danh mục nào được tìm thấy.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                    </x-admin.row-actions>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-400">
+                                    Chưa tìm thấy danh mục tour nào.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="mt-6">
+            @if ($categories->hasPages())
+                <div class="px-6 py-4 border-t border-gray-100">
                     {{ $categories->links() }}
                 </div>
-            </div>
-        </div>
+            @endif
+        </x-admin.card>
     </div>
 </x-admin-layout>
